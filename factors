@@ -1,35 +1,35 @@
-#!/usr/bin/python3
+#!/usr/bin/env bash
 
-import sympy
-import sys
+factorize() {
+    if [ $# -ne 1 ]; then
+        echo "Usage: factorize <number>"
+        return
+    fi
 
+    number=$1
 
-def factorize_number(n):
-    # Use sympy to factorize the number
-    factors = sympy.factorint(n)
-    return factors
+    # Factorize the number using factor command
+    factors=$(factor "$number")
 
+    # Extract prime factors
+    primes=($(echo "$factors" | awk '{for(i=2;i<=NF;++i) print $i}'))
 
-def main(filename):
-    try:
-        with open(filename, 'r') as file:
-            numbers = [int(line.strip()) for line in file.readlines()]
+    # Ensure two prime factors are obtained
+    if [ ${#primes[@]} -eq 2 ]; then
+        echo "$number=${primes[0]}*${primes[1]}"
+    else
+        echo "Error: Unable to factorize $number into two prime numbers."
+    fi
+}
 
-        for number in numbers:
-            factors = factorize_number(number)
-            p, q = factors.keys()
-            print(f"{number}={p}*{q}")
+if [ $# -ne 1 ]; then
+    echo 'Usage: factors <file>'
+    exit 1
+fi
 
-    except FileNotFoundError:
-        print(f"Error: File '{filename}' not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+input_file=$1
 
+while read number; do
+    factorize "$number"
+done < "$input_file"
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python factors.py <file>")
-        sys.exit(1)
-
-    filename = sys.argv[1]
-    main(filename)
