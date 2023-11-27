@@ -1,0 +1,35 @@
+#!/usr/bin/python3
+
+import sympy
+import sys
+
+
+def factorize_number(n):
+    # Use sympy to factorize the number
+    factors = sympy.factorint(n)
+    return factors
+
+
+def main(filename):
+    try:
+        with open(filename, 'r') as file:
+            numbers = [int(line.strip()) for line in file.readlines()]
+
+        for number in numbers:
+            factors = factorize_number(number)
+            p, q = factors.keys()
+            print(f"{number}={p}*{q}")
+
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python factors.py <file>")
+        sys.exit(1)
+
+    filename = sys.argv[1]
+    main(filename)
